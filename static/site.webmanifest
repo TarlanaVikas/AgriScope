@@ -1,0 +1,14 @@
+{
+  "name": "AgriScope",
+  "short_name": "AgriScope",
+  "description": "AI-powered plant disease detection using YOLO object detection.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf8ee",
+  "theme_color": "#12301f",
+  "icons": [
+    {"src": "/static/img/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/img/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/static/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

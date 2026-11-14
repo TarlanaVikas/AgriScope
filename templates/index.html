@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">AI-powered plant disease detection</p>
+      <h1>A closer look at <em>every</em> leaf.</h1>
+      <p class="lede">Upload a photo of a plant leaf. AgriScope runs it through a YOLO object detector, outlines the regions it recognizes as disease, pest damage or healthy tissue, and shows how confident it is in each call.</p>
+      <div class="actions">
+        <a class="btn" href="{{ url_for('main.detect') }}">Analyze a leaf photo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#recognizes">See what it recognizes</a>
+      </div>
+      <ul class="facts">
+        <li>{{ class_count }} classes recognized</li>
+        <li>Runs on CPU or GPU</li>
+        <li>Photos aren&rsquo;t stored</li>
+      </ul>
+    </div>
+
+    <figure class="specimen">
+      <div class="sheet">
+        <svg viewBox="0 0 480 560" role="img" aria-labelledby="plate-title">
+          <title id="plate-title">Illustration of a leaf with a lesion outlined by a detection box</title>
+          <defs>
+            <clipPath id="leafClip"><path d="M240 30C390 100 440 280 330 430 300 470 262 495 240 505 218 495 180 470 150 430 40 280 90 100 240 30Z"/></clipPath>
+          </defs>
+          <!-- flowering stem, grows then blooms -->
+          <path class="stem-grow" pathLength="1" d="M452 420C474 320 458 180 420 100" fill="none" stroke="#6b7340" stroke-width="6" stroke-linecap="round"/>
+          <path d="M455 345c-28-4-42-22-44-40 22 0 40 14 44 40Z" fill="#7cbb52" opacity=".9"/>
+          <g class="bloom">
+            <g transform="rotate(0 420 92)"><ellipse class="petal" cx="420" cy="66" rx="11" ry="25" fill="#d9748a"/></g>
+            <g transform="rotate(72 420 92)"><ellipse class="petal" cx="420" cy="66" rx="11" ry="25" fill="#e08fa0"/></g>
+            <g transform="rotate(144 420 92)"><ellipse class="petal" cx="420" cy="66" rx="11" ry="25" fill="#d9748a"/></g>
+            <g transform="rotate(216 420 92)"><ellipse class="petal" cx="420" cy="66" rx="11" ry="25" fill="#e08fa0"/></g>
+            <g transform="rotate(288 420 92)"><ellipse class="petal" cx="420" cy="66" rx="11" ry="25" fill="#d9748a"/></g>
+            <circle cx="420" cy="92" r="9" fill="#e2a62c"/>
+          </g>
+          <!-- main leaf -->
+          <path class="stem-grow" pathLength="1" d="M240 505C243 525 236 545 224 556" fill="none" stroke="#6b7340" stroke-width="8" stroke-linecap="round"/>
+          <path class="leaf-body-a" d="M240 30C90 100 40 280 150 430 180 470 218 495 240 505Z"/>
+          <path class="leaf-body-b" d="M240 30C390 100 440 280 330 430 300 470 262 495 240 505Z"/>
+          <g clip-path="url(#leafClip)">
+            <path class="leaf-vein" d="M240 40V505M240 120c-40-10-80 0-120 30M240 120c40-10 80 0 120 30M240 200c-45-10-90 5-140 45M240 200c45-10 90 5 140 45M240 290c-40-8-80 8-110 45M240 290c40-8 80 8 110 45M240 380c-30-5-55 8-72 30M240 380c30-5 55 8 72 30"/>
+            <path class="lesion" d="M290 215c10-15 40-10 45 10 5 20-20 37-37 27-13-8-16-24-8-37Z"/>
+            <ellipse class="lesion-ring" cx="312" cy="232" rx="35" ry="33"/>
+            <path class="lesion" d="M148 322c7-9 24-6 27 7 3 12-12 22-23 16-8-5-9-15-4-23Z" opacity=".85"/>
+            <ellipse class="lesion-ring" cx="161" cy="333" rx="21" ry="20" opacity=".7"/>
+            <path class="lesion" d="M276 372c5-6 16-4 18 4 2 8-8 14-15 10-5-3-6-9-3-14Z" opacity=".8"/>
+            <line class="scan-line" x1="60" y1="40" x2="420" y2="40"/>
+          </g>
+          <!-- detection box -->
+          <rect class="det-box" pathLength="1" x="262" y="190" width="100" height="96"/>
+          <g class="det-tag"><rect x="262" y="164" width="124" height="26" fill="#e2a62c"/><text x="272" y="182" font-family="Avenir Next, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#0d2016">detected region</text></g>
+        </svg>
+      </div>
+      <figcaption>Plate I. An illustration of what AgriScope does: find a lesion, box it, name it.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section band-cream" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2>From a leaf photo to a reading you can act on.</h2>
+    </div>
+    <ol class="steps">
+      <li>
+        <span class="num" aria-hidden="true">1</span>
+        <div><h3>Upload a photo</h3>
+        <p>Drop in a JPG, PNG or WebP of a single leaf, or pick one of the sample photos. The file is checked before anything is analyzed.</p></div>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">2</span>
+        <div><h3>Analyze with YOLO</h3>
+        <p>A YOLO object detector scans the image and proposes boxes around regions that match the classes it was trained on, each with a confidence score.</p></div>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">3</span>
+        <div><h3>Review the findings</h3>
+        <p>See every detection drawn on your photo, grouped by class, with plain-language notes on what the signs usually mean and general next steps.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="recognizes">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">What it recognizes</p>
+      <h2>An index of {{ class_count }} classes.</h2>
+      <p class="lede">These are the only things the bundled model has been trained to name. Anything else (a nutrient deficiency, a different disease, a plant it has never seen) may go undetected or be mistaken for one of these.</p>
+    </div>
+    <div class="index-grid">
+      {% for g in groups %}
+      <div class="index-row">
+        <h3>{{ g.title }}<small>{{ g['items']|length }} {{ 'class' if g['items']|length == 1 else 'classes' }}</small></h3>
+        <ul>{% for c in g['items'] %}<li data-g="{{ c.group_key }}">{{ c.label }}</li>{% endfor %}</ul>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section band-cream">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Built for</p>
+      <h2>People who look at plants for a living, or to learn.</h2>
+    </div>
+    <div class="audience">
+      <div><h3>Farmers</h3><p>A quick second look at a worrying leaf while you decide whether to call an adviser.</p></div>
+      <div><h3>Agricultural students</h3><p>See how a detector reads visual symptoms, and compare its reading with your own.</p></div>
+      <div><h3>Researchers</h3><p>An inspectable detection pipeline with open configuration and JSON output for each analysis.</p></div>
+      <div><h3>Crop-care professionals</h3><p>Triage photos from the field before a closer inspection or laboratory test.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section band-forest">
+  <div class="wrap">
+    <p class="eyebrow">Straight talk</p>
+    <h2 style="max-width:30ch">Useful, but not a laboratory.</h2>
+    <div class="limits">
+      <div><h3>One photo, one opinion</h3><p>A detector sees pixels, not the field. Lighting, focus, leaf age and background all change what it reports.</p></div>
+      <div><h3>Only what it was trained on</h3><p>It will not tell you which crop it is looking at, and it can confuse look-alike symptoms. Treat low confidence as a hint, not a verdict.</p></div>
+      <div><h3>No published accuracy</h3><p>The training data and evaluation results for the bundled weights were not provided, so AgriScope does not quote an accuracy figure.</p></div>
+    </div>
+    <div class="cta-row"><a class="btn btn--light" href="{{ url_for('main.detect') }}">Try it on a leaf photo</a></div>
+  </div>
+</section>
+{% endblock %}

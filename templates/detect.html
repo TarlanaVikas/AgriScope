@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Analyze a leaf photo: AgriScope{% endblock %}
+{% block content %}
+<div data-detect data-api="{{ url_for('main.api_detect') }}" data-max-mb="{{ max_mb }}" data-default-conf="{{ default_confidence }}" data-ready="{{ 'true' if model.ready else 'false' }}">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow">Plant health analysis</p>
+      <h1>Analyze a leaf photo</h1>
+      <p class="lede">Choose a clear photo of one leaf. AgriScope will outline what its detector recognizes and explain the findings.</p>
+      <ol class="stepper" aria-label="Progress">
+        <li data-step="1" aria-current="step"><span class="dot">1</span>Upload</li>
+        <li data-step="2"><span class="dot">2</span>Analyze</li>
+        <li data-step="3"><span class="dot">3</span>Review</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="wrap">
+    {% if not model.ready %}
+    <div class="notice" role="alert">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <div><strong>Detection is unavailable right now.</strong>{{ model.error or 'The model has not loaded.' }} Analysis will fail until this is fixed; see the README for setup details.</div>
+    </div>
+    {% endif %}
+
+    <div class="workbench">
+      <!-- LEFT: capture -->
+      <section class="panel" aria-labelledby="capture-h">
+        <h2 id="capture-h">Your photo</h2>
+
+        <div data-dz-wrap>
+          <label class="dropzone" data-dz>
+            <svg class="seedling" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <path d="M32 58V30" stroke="#6b7340" stroke-width="3" stroke-linecap="round"/>
+              <path d="M32 34C32 20 22 12 8 12c0 14 9 22 24 22Z" fill="#2f7a2b"/>
+              <path d="M32 28c0-12 8-19 22-19 0 13-8 20-22 19Z" fill="#7cbb52"/>
+              <path d="M22 58h20" stroke="#6b7340" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <strong>Drop a leaf photo here</strong>
+            <span>or <span class="browse">browse your files</span></span>
+            <small>JPG, PNG or WebP, up to {{ '%g'|format(max_mb) }} MB</small>
+            <input type="file" id="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="Choose a leaf photo to analyze">
+          </label>
+          <p class="field-error" role="alert" data-dz-error hidden></p>
+        </div>
+
+        <div class="preview" data-preview hidden>
+          <figure><img alt="Preview of your selected photo" data-preview-img></figure>
+          <div class="meta"><span data-preview-meta></span><button type="button" class="link-btn" data-remove>Remove</button></div>
+        </div>
+
+        <div class="control">
+          <label for="threshold">Detection threshold <output id="threshold-out" for="threshold">{{ (default_confidence * 100)|round|int }}%</output></label>
+          <input type="range" id="threshold" min="5" max="95" step="5" value="{{ (default_confidence * 100)|round|int }}" aria-describedby="threshold-help">
+          <p id="threshold-help">Lower finds more, including weaker guesses. Higher keeps only detections the model is more sure about.</p>
+        </div>
+
+        <div class="actions-row">
+          <button type="button" class="btn btn--primary-wide" data-analyze disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            Analyze photo
+          </button>
+        </div>
+
+        {% if samples %}
+        <div class="samples">
+          <h3>No photo handy?</h3>
+          <ul>
+            {% for s in samples %}
+            <li><button type="button" data-sample="{{ url_for('static', filename='samples/' + s.file) }}" aria-label="Use {{ s.alt|lower }}"><img src="{{ url_for('static', filename='samples/' + s.file) }}" alt="" loading="lazy"></button></li>
+            {% endfor %}
+          </ul>
+          <p>Sample photos are only for trying the tool. Their results show what the model reports, not confirmed diagnoses.</p>
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- RIGHT: results -->
+      <section class="panel results-panel" aria-labelledby="results-h" aria-busy="false" data-results>
+        <h2 id="results-h" class="sr-only">Results</h2>
+        <p class="sr-only" aria-live="polite" data-live></p>
+
+        <div class="empty" data-view="empty">
+          <svg class="sprout" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+            <path class="s-stem" pathLength="1" d="M60 112C60 90 58 70 60 48" stroke="#6b7340" stroke-width="4" stroke-linecap="round"/>
+            <path class="s-leaf l1" d="M60 60C60 40 44 28 20 30c0 22 16 34 40 30Z" fill="#2f7a2b"/>
+            <path class="s-leaf l2" d="M60 50c0-18 12-28 32-27 0 19-12 29-32 27Z" fill="#7cbb52"/>
+            <path d="M42 112h36" stroke="#6b7340" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <h2 style="font-size:1.6rem">Your reading will grow here</h2>
+          <p class="muted">Add a photo and press <strong>Analyze photo</strong>.</p>
+          <ul>
+            <li>Fill the frame with one leaf, in natural light.</li>
+            <li>Keep it in focus; include the affected area.</li>
+            <li>Plain backgrounds work better than busy ones.</li>
+          </ul>
+        </div>
+
+        <div class="loading" data-view="loading" hidden>
+          <svg class="grow" viewBox="0 0 120 130" fill="none" aria-hidden="true">
+            <path class="g-stem" pathLength="1" d="M60 124C60 96 58 60 60 18" stroke="#6b7340" stroke-width="4" stroke-linecap="round"/>
+            <path class="g-leaf r" d="M60 96C60 86 68 78 84 78c0 12-8 20-24 18Z" fill="#2f7a2b"/>
+            <path class="g-leaf" d="M60 96C60 86 52 78 36 78c0 12 8 20 24 18Z" fill="#7cbb52"/>
+            <path class="g-leaf r" d="M60 66C60 54 70 46 88 46c0 13-9 22-28 20Z" fill="#7cbb52"/>
+            <path class="g-leaf" d="M60 66C60 54 50 46 32 46c0 13 9 22 28 20Z" fill="#2f7a2b"/>
+            <path class="g-leaf r" d="M60 38C60 28 66 20 80 18c0 11-7 19-20 20Z" fill="#2f7a2b"/>
+            <path class="g-leaf" d="M60 38C60 28 54 20 40 18c0 11 7 19 20 20Z" fill="#7cbb52"/>
+          </svg>
+          <p><strong>Examining the leaf&hellip;</strong></p>
+          <p class="elapsed" aria-hidden="true" data-elapsed>0 s</p>
+          <p class="muted" data-slow hidden>Still working. Large photos take longer, especially on a CPU.</p>
+          <button type="button" class="btn btn--ghost btn--sm" data-cancel>Cancel</button>
+        </div>
+
+        <div class="failure" data-view="error" role="alert" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+          <h2 data-error-title tabindex="-1" style="font-size:1.5rem">Couldn&rsquo;t analyze that photo</h2>
+          <p data-error-message></p>
+          <button type="button" class="btn btn--sm" data-retry>Try again</button>
+        </div>
+
+        <div data-view="results" hidden>
+          <div class="verdict">
+            <p class="eyebrow" data-kicker>Result</p>
+            <h2 data-title tabindex="-1"></h2>
+            <p data-summary></p>
+            <p class="caution" data-caution hidden></p>
+          </div>
+          <div class="stage" data-stage>
+            <div class="stage-inner" data-stage-inner><img alt="Your photo with detection boxes drawn over it" data-stage-img></div>
+          </div>
+          <p class="legend-note" data-legend-note>Numbered boxes match the regions listed below. Hover or focus a finding, or pick a box chip, to see its label on the photo.</p>
+          <div class="findings" data-findings></div>
+          <p class="run-meta" data-run-meta></p>
+          <div class="actions-row" style="margin-top:0">
+            <button type="button" class="btn btn--ghost btn--sm" data-another>Analyze another photo</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-download>Save results (JSON)</button>
+          </div>
+          <p class="disclaimer">AgriScope reports visual patterns from a fixed set of classes. It does not identify the crop and is not a laboratory diagnosis. Confirm important decisions with a local agricultural adviser.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ url_for('static', filename='js/detect.js') }}?v={{ version }}"></script>{% endblock %}

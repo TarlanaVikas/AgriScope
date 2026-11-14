@@ -1,0 +1,54 @@
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+
+# ── Virtual environments ─────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Test & tool caches ───────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# ── Secrets & local configuration ────────────────────────
+# Keep .env.example (documented template); never commit real values.
+.env
+.env.*
+!.env.example
+
+# ── Node (not used by the app; ignored in case tooling is added) ──
+node_modules/
+npm-debug.log*
+
+# ── Runtime artifacts ────────────────────────────────────
+# AgriScope analyzes uploads in memory, but these are ignored in case you add persistence.
+/uploads/
+/tmp/
+*.log
+*.sqlite3
+*.db
+
+# ── Ultralytics / training output ────────────────────────
+runs/
+wandb/
+# Auto-downloaded stock base weights (not the trained model). models/best.pt is intentionally NOT ignored.
+/yolo*.pt
+/yolo11*.pt
+
+# ── Editors & OS ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

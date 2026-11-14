@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}: AgriScope{% endblock %}
+{% block content %}
+<section class="wrap error-page">
+  <div class="code" aria-hidden="true">{{ status }}</div>
+  <h1 style="font-size:clamp(2rem,5vw,3rem)">{{ title }}</h1>
+  <p class="lede">{{ message }}</p>
+  <p><a class="btn" href="{{ url_for('main.index') }}">Back to AgriScope</a></p>
+</section>
+{% endblock %}

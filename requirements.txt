@@ -1,0 +1,9 @@
+# Web app
+Flask>=3.0,<4
+waitress>=3.0          # production WSGI server (cross-platform)
+python-dotenv>=1.0     # optional: loads .env
+Pillow>=10.0
+numpy>=1.24
+
+# Detection. Installs PyTorch + OpenCV. For a CPU-only machine see the README for a smaller torch build.
+ultralytics>=8.3
