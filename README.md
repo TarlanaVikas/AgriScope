@@ -171,7 +171,3 @@ weights and is skipped automatically if `ultralytics` or `models/best.pt` is mis
 * There is no detection history (by design: the app stores nothing).
 * First request after startup is slower while the runtime warms up; CPU inference takes a few seconds per image.
 
-## Licensing
-
-See [NOTICE.md](NOTICE.md). In particular, Ultralytics is AGPL-3.0, the sample images' provenance is unknown, and the
-repository has no `LICENSE` for AgriScope's own code. Add one that suits you.
