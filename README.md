@@ -1,173 +1,217 @@
-# AgriScope
+ <div align="center">
 
-**AI-powered plant disease detection.** Upload a photo of a plant leaf, analyze it with a YOLO object detector,
-and review exactly where the model sees disease, pest damage or healthy tissue, along with how confident it is.
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6A994E,50:386641,100:1B4332&height=220&section=header&text=AgriScope&fontSize=55&fontColor=FFFFFF&fontAlignY=40&desc=AI-Powered%20Plant%20Disease%20Detection&descSize=18&descAlignY=60&animation=fadeIn" width="100%" />
 
-![AgriScope landing page](docs/screenshots/landing-page.png)
+  <h3>Detect. Analyze. Understand. Protect.</h3>
+</div>
 
-## What it is for
+**Detect. Analyze. Understand. Protect.**
 
-Spotting crop problems early matters, but expert help isn't always at hand. AgriScope gives **farmers, agricultural
-students, researchers and crop-care professionals** a fast, visual second opinion on a leaf photo and plain-language
-notes on what the detected signs usually mean. It is a decision aid, **not** a laboratory diagnosis.
+An AI-powered plant disease detection platform that uses YOLO object detection to identify crop diseases, pest damage, and healthy leaf tissue through image analysis.
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-111F68?style=for-the-badge&logo=ultralytics&logoColor=white)](https://docs.ultralytics.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+
+[Features](#features) • [How It Works](#how-it-works) • [Model Details](#model-details) • [API](#api) • [Security](#security--privacy)
+
+</div>
+
+---
+
+## Overview
+
+Identifying crop diseases at an early stage can help prevent agricultural losses. However, expert assistance is not always immediately available.
+
+**AgriScope** provides farmers, agricultural students, researchers, and crop-care professionals with a visual second opinion through AI-powered leaf image analysis.
+
+Upload a plant leaf image and let the YOLO object detector identify visible disease symptoms, pest damage, or healthy tissue. Review detection boxes, confidence scores, grouped findings, and general reference guidance.
+
+AgriScope is designed as a decision-support tool, not a replacement for laboratory diagnosis or professional agronomic advice.
+
+<img src="docs/screenshots/landing-page.png" width="100%" alt="AgriScope Landing Page" />
+
 
 ## Features
 
-* **Upload → Analyze → Review** workflow with drag-and-drop, paste, file picker and bundled sample photos.
-* Client- and server-side validation (type, size, pixel count, corrupt files) with clear inline errors.
-* **Real model output only:** every box, class and confidence on screen comes from the loaded weights.
-* Detection boxes drawn on your photo, grouped findings, adjustable detection threshold, JSON export of each result.
-* Static, clearly labelled reference notes (signs to look for, general next steps) for each of the 15 classes.
-* Honest states: empty, analyzing (indeterminate, with elapsed time and cancel), no detections, errors, model unavailable.
-* Responsive layout (tested at desktop, tablet and phone widths), keyboard-operable, `prefers-reduced-motion` respected.
-* JSON API (`/api/detect`, `/api/health`) for scripting.
+- **AI-Powered Detection:** YOLO-based object detection for 15 plant disease, pest, and healthy-leaf classes.
+- **Simple Image Upload:** Drag-and-drop, paste, file picker, and bundled sample images.
+- **Visual Detection Results:** Bounding boxes highlight exactly where the model identifies findings.
+- **Confidence Scores:** Review individual detection confidence values.
+- **Adjustable Threshold:** Customize the detection confidence threshold.
+- **Grouped Findings:** Organize detections by class with corresponding reference notes.
+- **Reference Guidance:** General symptoms and suggested next steps for all 15 supported classes.
+- **JSON Export:** Export individual detection results for further analysis.
+- **Robust Validation:** Image type, file size, dimensions, pixel count, and corrupt-file validation.
+- **Transparent Model Output:** All displayed detections originate from actual model predictions.
+- **Responsive Interface:** Designed for desktop, tablet, and mobile screens.
+- **JSON API:** Programmatic access through detection and health endpoints.
 
-| | |
+## Screenshots
+
+<div align="center">
+
+### Landing Page
+<img src="docs/screenshots/landing-page.png" width="90%" alt="AgriScope Landing Page" />
+
+### Image Analysis
+<img src="docs/screenshots/detect-page.png" width="90%" alt="AgriScope Detection Page" />
+
+### Detection Results
+<img src="docs/screenshots/detect-results.png" width="90%" alt="AgriScope Detection Results" />
+
+### Mobile Experience
+<img src="docs/screenshots/mobile-results.png" width="260" alt="AgriScope Mobile Results" />
+
+</div>
+
+## How It Works
+
+AgriScope follows a straightforward image-analysis pipeline:
+
+1. **Upload:** The user submits a JPG, PNG, or WebP plant image.
+2. **Validation:** The server validates the file, checks image dimensions, corrects EXIF orientation, and converts it to RGB.
+3. **Inference:** The shared Ultralytics YOLO model processes the image using the selected confidence threshold.
+4. **Detection:** The model returns detected classes, confidence scores, and bounding-box coordinates.
+5. **Visualization:** Detection boxes are drawn over the original image.
+6. **Guidance:** Findings are grouped and displayed alongside relevant reference notes.
+
+## Model Details
+
+| Attribute | Details |
 |---|---|
-| ![Analyze page](docs/screenshots/detect-page.png) | ![Results](docs/screenshots/detect-results.png) |
+| Model | YOLOv8s |
+| Framework | Ultralytics |
+| Ultralytics Version | 8.2.103 (training metadata) |
+| Task | Object Detection |
+| Number of Classes | 15 |
+| Input Size | 800 |
+| Model Weights | `models/best.pt` |
 
-<img src="docs/screenshots/mobile-results.png" alt="Results on a phone" width="260">
+**Important:** The bundled model is YOLOv8s, not YOLO11. Its training dataset and evaluation metrics are unavailable, so no accuracy claims are made.
 
-## How detection works
+### Supported Detection Classes
 
-1. The browser sends the image to `POST /api/detect`.
-2. The server checks the file (magic bytes, size, dimensions), corrects EXIF rotation, and converts it to RGB, all in memory.
-3. A single, shared Ultralytics model (loaded once at startup) predicts boxes at the confidence threshold you chose.
-4. The server returns every detection (class, confidence, box in pixel coordinates), grouped into findings.
-5. The page draws the boxes over your photo and shows the matching reference notes.
-
-### About the bundled model
-
-| | |
+| ID | Detection Class |
 |---|---|
-| File | `models/best.pt` |
-| Task | Object detection, 15 classes, input size 800 |
-| Architecture | **YOLOv8s** (the file's training metadata records `yolov8s.pt` as the base and Ultralytics 8.2.103). It is **not** a YOLO11 model. |
-| Training data / metrics | Not provided with the project, so **no accuracy figures are quoted** |
+| 0 | Aphids |
+| 1 | Early Blight |
+| 2 | Healthy Leaf |
+| 3 | Leaf Curl |
+| 4 | Leafhoppers and Jassids |
+| 5 | Mold |
+| 6 | Mosaic Virus |
+| 7 | Septoria Leaf Spot |
+| 8 | Bacterial Canker |
+| 9 | Bacterial Spot |
+| 10 | Flea Beetle |
+| 11 | Late Blight |
+| 12 | Leafminer |
+| 13 | Powdery Mildew |
+| 14 | Yellow Curl Virus |
 
-Any Ultralytics *detection* weights can be used via `AGRISCOPE_MODEL_PATH`. Stock `yolo11n.pt` was loaded and run
-through the same code path as a compatibility check (it has COCO classes, not plant diseases). Classes AgriScope has
-no reference notes for are shown under their raw names without guidance.
-
-**Classes (id: name in the weights → label shown):**
-0 `Aphids`, 1 `Early Blight`, 2 `Healthy Leaf-` (Healthy leaf), 3 `Leaf Curl`, 4 `Leafhoppers and Jassids`, 5 `Molds` (Mold),
-6 `Mosaic Virus`, 7 `Septoria` (Septoria leaf spot), 8 `bactarial canker` (Bacterial canker), 9 `bacterial spot`,
-10 `flea beetle`, 11 `late_blight` (Late blight), 12 `leafminer`, 13 `powedry_mildew` (Powdery mildew), 14 `yellow curl virus`.
-Typos in the weights' class names are corrected for display only; class IDs and the model are unchanged.
-
-## Quick start
-
-Requires Python 3.10+.
-
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
-
-# Optional but recommended on CPU-only machines (much smaller than the default CUDA build):
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-pip install -r requirements.txt
-python app.py            # http://127.0.0.1:5000
-```
-
-Production-style serving (cross-platform):
-
-```bash
-waitress-serve --listen=0.0.0.0:8000 --call agriscope:create_app
-```
-
-The app starts even if the model can't load. In that case the Analyze page shows a clear banner and `/api/detect`
-returns `503 model_unavailable` instead of fabricating a result.
-
-### Configuration
-
-Environment variables (or a `.env` file; see [`.env.example`](.env.example)):
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `AGRISCOPE_MODEL_PATH` | `models/best.pt` | Weights file (relative to project root or absolute) |
-| `AGRISCOPE_CONF` | `0.25` | Default confidence threshold (0.05–0.95) |
-| `AGRISCOPE_MAX_UPLOAD_MB` | `10` | Upload size limit |
-| `AGRISCOPE_MAX_PIXELS` | `40000000` | Reject images with more pixels than this |
-| `AGRISCOPE_MAX_DET` | `100` | Maximum detections per image |
-| `AGRISCOPE_DEVICE` | `auto` | `auto`, `cpu`, or a GPU index such as `0` |
-| `AGRISCOPE_IMGSZ` | from weights | Override inference image size |
-| `AGRISCOPE_PRELOAD_MODEL` | `true` | Load the model at startup |
-| `AGRISCOPE_HOST` / `AGRISCOPE_PORT` | `127.0.0.1` / `5000` | Dev server bind (`python app.py`) |
-| `AGRISCOPE_DEBUG` | off | Flask debug mode. Development only. |
+Class names are normalized for display where necessary. The underlying model class IDs and weights remain unchanged.
 
 ## API
 
-`POST /api/detect`: multipart form with `file` (JPG/PNG/WebP) and optional `confidence` (0.05–0.95).
+AgriScope provides JSON endpoints for integration and programmatic access.
 
-```jsonc
-{
-  "ok": true,
-  "image": {"width": 195, "height": 259},
-  "threshold": 0.25,
-  "inference_ms": 1760,
-  "detections": [
-    {"id": 0, "class_id": 11, "raw_label": "late_blight", "label": "Late blight",
-     "group": "Fungal and mold-type disease", "healthy": false, "confidence": 0.8275,
-     "box": {"x1": 41.0, "y1": 30.5, "x2": 150.2, "y2": 238.0}}   // pixels, in the EXIF-corrected image
-  ],
-  "findings": [ /* detections grouped by class, with reference notes under "guidance" */ ]
-}
-```
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/detect` | POST | Analyze an uploaded plant image |
+| `/api/health` | GET | Check model availability |
 
-Errors are always `{"ok": false, "error": {"code": "...", "message": "..."}}` with these statuses:
-`400` `no_file`, `empty_file`, `invalid_confidence` · `413` `file_too_large` · `415` `unsupported_type` ·
-`422` `corrupt_image`, `image_too_small`, `image_too_large` · `503` `model_unavailable` · `500` `inference_failed`, `internal_error`.
-`GET /api/health` reports whether the model is loaded.
+### Detection API
 
-## Project structure
+`POST /api/detect`
 
-```
-app.py                 entry point (dev server)
-agriscope/
-  __init__.py          app factory, error handlers, security headers
-  config.py            environment-based configuration
-  detector.py          model loading (once), thread-safe inference, result serialization
-  imaging.py           upload validation and decoding (in memory)
-  knowledge.py         static reference notes per class
-  routes.py            pages and JSON API
-models/best.pt         trained weights (see above)
-templates/             Jinja pages (landing, detect, about, error)
-static/                css/, js/ (vanilla, no build step), img/, samples/
-tests/                 pytest suite
-docs/screenshots/      images used in this README
+**Request parameters:**
+- `file`: Plant image (JPG, PNG, or WebP).
+- `confidence`: Optional detection threshold (0.05–0.95).
+
+**Response includes:**
+- Image dimensions
+- Selected confidence threshold
+- Inference time
+- Detection class and ID
+- Confidence score
+- Bounding-box coordinates
+- Grouped findings and reference guidance
+
+The API also provides structured error responses for invalid uploads, unsupported formats, oversized images, inference failures, and unavailable models.
+
+## Security & Privacy
+
+- Images are processed in memory and discarded after analysis.
+- No uploaded images are permanently stored by the application.
+- File validation uses actual file content rather than trusting filenames or declared MIME types.
+- Upload size, image pixel count, and detection limits are enforced.
+- API errors do not expose internal stack traces or server file paths.
+- Ultralytics automatic runtime installation is disabled.
+- Security headers include Content Security Policy, MIME sniffing protection, and frame denial.
+- No user accounts, analytics, third-party scripts, external fonts, or external API keys are required.
+
+## Limitations
+
+- Detection is restricted to the 15 classes supported by the bundled model.
+- Crop species identification is not supported.
+- Image quality, lighting, blur, and complex backgrounds can affect detection.
+- Confidence scores represent model confidence, not the probability of a correct diagnosis.
+- The bundled model's training dataset and independently evaluated performance metrics are unavailable.
+- Reference guidance is informational and does not replace professional agricultural advice.
+
+## Project Structure
+
+```text
+AgriScope/
+│
+├── app.py
+├── agriscope/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── detector.py
+│   ├── imaging.py
+│   ├── knowledge.py
+│   └── routes.py
+│
+├── models/
+│   └── best.pt
+│
+├── templates/
+├── static/
+│   ├── css/
+│   ├── js/
+│   ├── img/
+│   └── samples/
+│
+├── tests/
+├── docs/
+│   └── screenshots/
+│
+├── requirements.txt
+└── requirements-dev.txt
 ```
 
 ## Testing
 
-```bash
-pip install -r requirements-dev.txt
-pytest
-```
+AgriScope includes a pytest suite covering application pages, API behavior, validation, and model integration.
 
-The API/page tests use a fake detector and run without PyTorch. `tests/test_model_integration.py` loads the real
-weights and is skipped automatically if `ultralytics` or `models/best.pt` is missing.
+- Application and API tests use a fake detector, allowing them to run without PyTorch.
+- Model integration tests use the actual bundled weights.
+- Integration tests are automatically skipped when the required model or Ultralytics dependency is unavailable.
 
-## Security and privacy
+---
 
-* Uploads are read into memory, validated by content (not by filename or declared type), analyzed and discarded.
-  Nothing is written to disk, so there are no temporary files or path-traversal surface.
-* Size, pixel-count and detection limits; decompression-bomb and truncated-file handling.
-* API errors never include stack traces or file paths (details go to server logs only).
-* Ultralytics runtime auto-install is disabled; the server never `pip install`s anything.
-* Strict Content-Security-Policy (no inline scripts), `nosniff`, frame denial, same-origin referrer policy.
-* No accounts, cookies, analytics, third-party scripts or fonts, and no external API keys.
-* If you host AgriScope behind a proxy/CDN, that layer may keep its own logs. Review its retention.
+<div align="center">
 
-## Known limitations
+### Bringing AI Closer to Smarter Agriculture
 
-* The model recognizes only its 15 classes and cannot identify the crop species.
-* It is sensitive to image quality; busy backgrounds, glare, blur and multiple leaves reduce reliability.
-* Confidence is the model's score, **not** the probability that a diagnosis is right.
-* Informal checks on the bundled samples show the model is imperfect: several sample files (named for a different
-  condition) were assigned other classes or no detection. This is anecdotal, **not** an evaluation.
-* Training data and evaluation metrics for `best.pt` are unavailable, so no accuracy figures are published here.
-* Reference notes are general; they contain no product names or doses, and don't replace local agronomic advice.
-* There is no detection history (by design: the app stores nothing).
-* First request after startup is slower while the runtime warms up; CPU inference takes a few seconds per image.
+**AgriScope — Detect Early. Understand Better. Grow Smarter.**
 
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1B4332,50:386641,100:6A994E&height=100&section=footer" width="100%" />
+
+</div>
